@@ -36,7 +36,7 @@ Options parse_options(int argc, char** argv) {
         }
     }
 
-    if (opts.dbn_path.empty()) {
+    if (opts.mode != Mode::Engine && opts.dbn_path.empty()) {
         throw std::runtime_error("Missing --dbn=PATH");
     }
 
