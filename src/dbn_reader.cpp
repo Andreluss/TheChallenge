@@ -1,11 +1,15 @@
 #include "dbn_reader.hpp"
 
-// TODO: include necessary databento headers and implement constructor + next()
-// For now you can just return std::nullopt in next() as a stub.
-DbnReader::DbnReader(const std::string&, std::optional<std::uint32_t>) {
-    // TODO
+DbnReader::DbnReader(const std::string& file): store_(file)
+{
 }
 
-std::optional<MboEvent> DbnReader::next() {
-    return std::nullopt; // stub
+std::optional<databento::MboMsg> DbnReader::next()
+{
+    if (const databento::Record *rec = store_.NextRecord())
+    {
+        const auto &mbo = rec->Get<databento::MboMsg>();
+        return mbo;
+    }
+    return std::nullopt;
 }

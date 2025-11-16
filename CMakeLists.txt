@@ -64,6 +64,18 @@ target_link_libraries(mbo_app
         # nlohmann_json::nlohmann_json
 )
 
+add_executable(dbn_reader_test
+    src/dbn_reader_test_main.cpp
+    src/dbn_reader.cpp
+)
+
+target_include_directories(dbn_reader_test PRIVATE src)
+
+target_link_libraries(dbn_reader_test
+    PRIVATE
+        databento::databento
+)
+
 # Optional: separate Release as default if not set
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)

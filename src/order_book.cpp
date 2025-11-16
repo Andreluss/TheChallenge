@@ -1,7 +1,7 @@
 #include "order_book.hpp"
 #include <fstream>
 
-void OrderBook::on_event(const MboEvent& ev) {
+void OrderBook::on_event(const databento::MboMsg& ev) {
     // TODO: implement add/modify/delete/trade logic
 }
 

@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         switch (opts.mode) {
             case Mode::Replay: {
                 // DBN -> OrderBook -> JSON snapshot
-                DbnReader reader{opts.dbn_path, opts.instrument_id};
+                DbnReader reader{opts.dbn_path};
                 OrderBook book;
 
                 while (auto ev = reader.next()) {
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 
             case Mode::Streamer: {
                 // DBN -> TCP stream (line-based protocol), rate-limited
-                DbnReader reader{opts.dbn_path, opts.instrument_id};
+                DbnReader reader{opts.dbn_path};
                 run_streamer(reader, opts); // implement in net.cpp
                 break;
             }

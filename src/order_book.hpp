@@ -20,9 +20,11 @@ struct Level {
     std::size_t num_orders;
 };
 
+
+
 class OrderBook {
 public:
-    void on_event(const MboEvent& ev);
+    void on_event(const databento::MboMsg& ev);
 
     nlohmann::json snapshot() const;
     void write_snapshot_json(const std::string& path) const;
