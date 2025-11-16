@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
                 }
 
                 book.write_snapshot_json(opts.output_path);
+                book.print_latency_stats();
                 break;
             }
 

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cstdint>
+#include <chrono>
 #include "dbn_reader.hpp"
 #include <nlohmann/json.hpp>
 #include <databento/pretty.hpp> // Px
@@ -407,6 +408,9 @@ public:
 
     void write_snapshot_json(const std::string &path) const;
 
+    void print_latency_stats() const;
 private:
+    using Clock = std::chrono::steady_clock;
+    std::vector<uint64_t> latencies_ns_;  // one per event / JSON output
     DBBook book_;
 };
