@@ -1,7 +1,8 @@
 # TheChallenge
 
 I spent 5h today and implemented the Core requirements 1 and 2 (C++). 
-<img width="1498" height="346" alt="image" src="https://github.com/user-attachments/assets/9554446e-bc8e-4ed7-9068-1f42518bd0f3" />
+<img width="1403" height="155" alt="image" src="https://github.com/user-attachments/assets/55029b62-b5dd-4033-85f8-b3efdbec2126" />
+
 ## Build 
 I recommend importing the project to vscode with C++ and CMake Tools extensions.  
 Alternatively, in the project folder: 
