@@ -187,7 +187,7 @@ void run_engine(OrderBook& book, const Options& opts) {
         auto t0 = std::chrono::steady_clock::now();
 
         book.on_event(msg); 
-        auto snapshot = book.snapshot();
+        auto snapshot = book.snapshot(opts.order_book_levels.value_or(5));
         snapshot["ts"] = msg.ts_recv.time_since_epoch().count();
 
         // B: Snapshot generated and ready to be serialized

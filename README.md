@@ -18,7 +18,7 @@ mkdir build
 ./mbo_app --mode=streamer --dbn=../data/CLX5_mbo.dbn --port=9000 --rate=200000
 
 # terminal 2
-./mbo_app --mode=engine --host=127.0.0.1 --port=9000 --out=../output/stream_book.json
+./mbo_app --mode=engine --host=127.0.0.1 --port=9000 --levels=10 --out=../output/stream_book.json
 ```
 ### Replay
 Just loads the order data and processes it within the same binary, skipping the network stack.
@@ -39,6 +39,7 @@ I used ChatGPT to generate obvious parts of the code.
 ## Update
 - snapshots generated on every message received snapshots
 - measuring the latency: [ message received ] - [order book reconstruction complete, json snapshot data is ready to be serialized]
+- configurable levels in the orderbook snapshot 
 
 ## Potential future improvements 
 - configurable snapshot generation - every tick vs every chosen time interval 

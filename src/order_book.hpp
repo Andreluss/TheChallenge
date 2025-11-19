@@ -389,7 +389,7 @@ public:
     uint64_t error_count = 0;
     void on_event(const databento::MboMsg &ev);
 
-    json snapshot(int level_count=10) const
+    json snapshot(int level_count) const
     {
         json j;
 
@@ -412,6 +412,7 @@ public:
             {
                 level_json["bid_price"] = bid_level.price;
                 level_json["bid_size"] = bid_level.size;
+                level_json["bid_count"] = bid_level.count;
             }
 
             auto ask_level = book_.GetAskLevel(level);
@@ -419,6 +420,7 @@ public:
             {
                 level_json["ask_price"] = ask_level.price;
                 level_json["ask_size"] = ask_level.size;
+                level_json["ask_count"] = ask_level.count;
             }
 
             if (!bid_level && !ask_level)

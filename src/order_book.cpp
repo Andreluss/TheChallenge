@@ -26,7 +26,7 @@ void OrderBook::on_event(const databento::MboMsg& ev) {
 }
 
 void OrderBook::write_snapshot_json(const std::string& path) const {
-    auto j = snapshot();
+    auto j = snapshot(10);
     std::ofstream out(path);
     out << j.dump(2) << "\n";
     std::cerr << "Wrote order book snapshot to " << path << "\n";

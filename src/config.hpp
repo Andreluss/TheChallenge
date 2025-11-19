@@ -13,7 +13,7 @@ enum class Mode {
 struct Options {
     Mode mode;
     std::string dbn_path;
-    std::optional<std::uint32_t> instrument_id;
+    std::optional<std::uint32_t> order_book_levels;
 
     // For replay
     std::string output_path = "book.json";

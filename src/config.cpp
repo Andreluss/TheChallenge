@@ -30,9 +30,9 @@ Options parse_options(int argc, char** argv) {
             opts.rate = std::stoull(std::string(arg.substr(7)));
         } else if (arg.rfind("--host=", 0) == 0) {
             opts.host = std::string(arg.substr(7));
-        } else if (arg.rfind("--instrument=", 0) == 0) {
-            opts.instrument_id = static_cast<std::uint32_t>(
-                std::stoul(std::string(arg.substr(12))));
+        } else if (arg.rfind("--levels=", 0) == 0) {
+            opts.order_book_levels = static_cast<std::uint32_t>(
+                std::stoul(std::string(arg.substr(9))));
         }
     }
 
