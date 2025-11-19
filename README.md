@@ -17,7 +17,7 @@ mkdir build
 ./mbo_app --mode=streamer --dbn=../data/CLX5_mbo.dbn --port=9000 --rate=200000
 
 # terminal 2
-./mbo_app --mode=engine --host=127.0.0.1 --port=9000 --out=..data/stream_book.json
+./mbo_app --mode=engine --host=127.0.0.1 --port=9000 --out=../output/stream_book.json
 ```
 ### Replay
 Just loads the order data and processes it within the same binary, skipping the network stack.
@@ -34,3 +34,10 @@ One binary, can be run with 3 modes:
 Both engine and replay output the latency numbers in p99. 
 The code relies on the Databento's structs (MboMsg) and the example attached to the problem description: https://databento.com/docs/examples/order-book/limit-order-book/example 
 I used ChatGPT to generate obvious parts of the code. 
+
+## Update
+- snapshots generated on every message received snapshots
+- measuring the latency: [ message received ] - [order book reconstruction complete, json snapshot data is ready to be serialized]
+
+## Potential future improvements 
+- configurable snapshot generation - every tick vs every chosen time interval 

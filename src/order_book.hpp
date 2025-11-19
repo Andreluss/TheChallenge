@@ -11,6 +11,7 @@
 
 // Adapted from https://databento.com/docs/examples/order-book/limit-order-book/example
 namespace db = databento;
+using json = nlohmann::json;
 
 struct PriceLevel
 {
@@ -25,32 +26,14 @@ struct PriceLevel
 class DBBook
 {
 public:
-    nlohmann::json snapshot() const
-    {
-        nlohmann::json j;
-
-        // Bids: highest price first (already sorted)
-        for (const auto &[price, lvl] : bids_)
-        {
-            j["bids"].push_back({{"price", price},
-                                 {"qty", LevelOrdersCount(lvl)},
-                                 {"orders", LevelNumOrders(lvl)}});
-        }
-
-        // Asks: lowest price first
-        for (const auto &[price, lvl] : offers_)
-        {
-            j["asks"].push_back({{"price", price},
-                                 {"qty", LevelOrdersCount(lvl)},
-                                 {"orders", LevelNumOrders(lvl)}});
-        }
-
-        return j;
-    }
-
     std::pair<PriceLevel, PriceLevel> Bbo() const
     {
         return {GetBidLevel(), GetAskLevel()};
+    }
+
+    std::pair<int, int> BidAskLevelCounts() const
+    {
+        return {static_cast<int>(bids_.size()), static_cast<int>(offers_.size())};
     }
 
     PriceLevel GetBidLevel(std::size_t idx = 0) const
@@ -405,6 +388,49 @@ public:
     uint64_t total_orders = 0;
     uint64_t error_count = 0;
     void on_event(const databento::MboMsg &ev);
+
+    json snapshot(int level_count=10) const
+    {
+        json j;
+
+        auto [best_bid, best_offer] = book_.Bbo();
+        j["best_bid"] = best_bid.price;
+        j["best_bid_size"] = best_bid.size;
+        j["best_ask"] = best_offer.price;
+        j["best_ask_size"] = best_offer.size;
+        auto [bid_levels, ask_levels] = book_.BidAskLevelCounts();
+        j["bid_levels"] = static_cast<uint32_t>(bid_levels);
+        j["ask_levels"] = static_cast<uint32_t>(ask_levels);
+
+        j["levels"] = json::array();
+
+        for (int level = 0; level < level_count; ++level)
+        {
+            json level_json;
+            auto bid_level = book_.GetBidLevel(level);
+            if (bid_level)
+            {
+                level_json["bid_price"] = bid_level.price;
+                level_json["bid_size"] = bid_level.size;
+            }
+
+            auto ask_level = book_.GetAskLevel(level);
+            if (ask_level)
+            {
+                level_json["ask_price"] = ask_level.price;
+                level_json["ask_size"] = ask_level.size;
+            }
+
+            if (!bid_level && !ask_level)
+            {
+                break;
+            }
+
+            j["levels"].push_back(level_json);
+        }
+
+        return j;
+    }
 
     void write_snapshot_json(const std::string &path) const;
 

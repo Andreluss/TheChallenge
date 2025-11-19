@@ -11,12 +11,12 @@ void OrderBook::on_event(const databento::MboMsg& ev) {
     }
     catch (const std::invalid_argument& ex) {
         // Log and ignore invalid events
-        std::cerr << "Warning: " << ex.what() << "\n";
+        // std::cerr << "Warning: " << ex.what() << "\n";
         error_count++;
     }
     catch (const std::logic_error& ex) {
         // Log and ignore logic errors
-        std::cerr << "Warning: " << ex.what() << "\n";
+        // std::cerr << "Warning: " << ex.what() << "\n";
         error_count++;
     }
 
@@ -26,7 +26,7 @@ void OrderBook::on_event(const databento::MboMsg& ev) {
 }
 
 void OrderBook::write_snapshot_json(const std::string& path) const {
-    auto j = book_.snapshot();
+    auto j = snapshot();
     std::ofstream out(path);
     out << j.dump(2) << "\n";
     std::cerr << "Wrote order book snapshot to " << path << "\n";

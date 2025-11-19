@@ -144,6 +144,23 @@ void run_streamer(DbnReader& reader, const Options& opts) {
     std::cout << "Streamer finished sending " << sent << " messages\n";
 }
 
+static void write_snapshot_to_file(json j, std::string path, std::optional<int> snapshot_id) {
+    if (snapshot_id) {
+        // bla.json -> bla_123.json
+        auto dot_pos = path.rfind('.');
+        std::string base = (dot_pos == std::string::npos) ? path : path.substr(0, dot_pos);
+        std::string ext = (dot_pos == std::string::npos) ? "" : path.substr(dot_pos);
+        path = base + "_" + std::to_string(*snapshot_id) + ext;
+    }
+
+    std::ofstream out(path);
+    if (out.fail()) {
+        throw std::runtime_error("Failed to open output file: " + path);
+    }
+    out << j.dump(2) << "\n";
+    std::cerr << "Wrote order book snapshot to " << path << "\n";
+}
+
 void run_engine(OrderBook& book, const Options& opts) {
     int sock = connect_to_server(opts.host, opts.port);
     std::cout << "Engine connected to " << opts.host << ":" << opts.port << "\n";
@@ -156,20 +173,31 @@ void run_engine(OrderBook& book, const Options& opts) {
     std::vector<double> latencies_us;
     latencies_us.reserve(1'000'000);
 
-    MboMsg msg{};
+    MboMsg msg{}; 
+
+    json whole_feed_json = json::array();
 
     while (true) {
         std::size_t n = recv_all(sock, &msg, MSG_SIZE);
         if (n == 0) break;        // EOF
         if (n < MSG_SIZE) break;  // truncated / error
 
+        // Measuring latency between A and B
+        // A: Message received
         auto t0 = std::chrono::steady_clock::now();
 
-        book.on_event(msg);
+        book.on_event(msg); 
+        auto snapshot = book.snapshot();
+        snapshot["ts"] = msg.ts_recv.time_since_epoch().count();
 
+        // B: Snapshot generated and ready to be serialized
         auto t1 = std::chrono::steady_clock::now();
         double us = std::chrono::duration<double, std::micro>(t1 - t0).count();
         latencies_us.push_back(us);
+        
+        whole_feed_json.push_back(snapshot);
+        // here the snapshot can be optionally written to file / logged / streamed to a DB
+        // write_snapshot_to_file(snapshot, opts.output_path, msg.ts_recv.time_since_epoch().count());
 
         ++received;
     }
@@ -185,12 +213,13 @@ void run_engine(OrderBook& book, const Options& opts) {
         double p95 = latencies_us[std::min(idx95, latencies_us.size() - 1)];
         double throughput = received / total_s;
 
-        std::cerr << "{ \"metric\": \"latency_p99_us\", \"value\": " << p99 << " }\n";
-        std::cerr << "{ \"metric\": \"latency_p95_us\", \"value\": " << p95 << " }\n";
-        std::cerr << "{ \"metric\": \"throughput_msg_per_s\", \"value\": " << throughput << " }\n";
+        std::cerr << "== Metrics ==\n";
+        std::cerr << "Latency (p99): " << p99 << " us\n";
+        std::cerr << "Latency (p95): " << p95 << " us\n";
+        std::cerr << "Throughput    : " << throughput << " msg/s\n";
     }
 
-    ::close(sock);
+    write_snapshot_to_file(whole_feed_json, opts.output_path, std::nullopt);
 
-    book.write_snapshot_json(opts.output_path);
+    ::close(sock);
 }
